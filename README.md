@@ -11,14 +11,14 @@ This project implements a Lambda integration for custom SAML 2.0-based federatio
 
 1. Create a new directory called **quicksight-saml** and change to it:
 ```bash
-mkdir quicksight-saml && cd quicksight-saml
+mkdir quicksight-saml-project && cd quicksight-saml-project
 ```
 2. Initialize a new SAM project:
 ```bash
 sam init
 ```
 3. Select option **2**: **Custom Template Location**
-4. Enter this repository URL `https://github.com/aws-samples/PLACEHOLDER` as the location
+4. Enter this repository URL `https://github.com/qalius/aws-sample-quicksight-saml` as the location
 5. Read this blog post for instructions: https://aws.amazon.com/blogs/PLACEHOLDER
 
 ## Deploy
