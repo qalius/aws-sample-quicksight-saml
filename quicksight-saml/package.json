@@ -1,0 +1,15 @@
+{
+  "name": "quicksight_saml",
+  "version": "1.0.0",
+  "description": "Lambda integration for custom SAML 2.0-based federation between Google Workspaces and Amazon QuickSight",
+  "main": "app.js",
+  "author": "Benedikt Langens <benedikt@qalius.com>",
+  "license": "MIT",
+  "dependencies": {
+    "fast-xml-parser": "^3.21.1",
+    "axios": "^0.24.0"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.1019.0"
+  }
+}

@@ -1,0 +1,70 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Lambda integration for custom SAML 2.0-based federation between Google Workspaces and Amazon QuickSight
+
+Parameters:
+  IdentityProviderArn:
+    Type: String
+    Default: arn:aws:iam::123456789012:saml-provider/GoogleWorkspace
+
+  QuickSightSamlFederationRoleName:
+    Type: String
+    Default: QuickSightSAMLFederationRole
+
+Resources:
+  QuickSightSamlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: quicksight-saml/
+      Handler: app.lambdaHandler
+      Environment:
+        Variables:
+          QUICKSIGHT_IAM_ROLE_NAME: !Ref QuickSightSamlFederationRoleName
+          IDENTITY_PROVIDER_ARN: !Ref IdentityProviderArn
+      Runtime: nodejs14.x
+      Timeout: 30
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action: 'quicksight:DescribeUser'
+              Resource: !Sub 'arn:aws:quicksight:${AWS::Region}:${AWS::AccountId}:user/*'
+            - Effect: Allow
+              Action: 'quicksight:RegisterUser'
+              Resource: !Sub 'arn:aws:quicksight:${AWS::Region}:${AWS::AccountId}:user/*'
+              Condition:
+                StringLike:
+                  'quicksight:IamArn': !Sub 'arn:aws:iam::${AWS::AccountId}:role/${QuickSightSamlFederationRoleName}'
+      Events:
+        QuickSightSaml:
+          Type: HttpApi
+          Properties:
+            Path: /quicksight-saml
+            Method: POST
+            RouteSettings: # Adjust API throttling settings to your needs
+              ThrottlingRateLimit: 200
+              ThrottlingBurstLimit: 100
+
+  QuickSightSamlFederationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref QuickSightSamlFederationRoleName
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Ref IdentityProviderArn
+            Action: 'sts:AssumeRoleWithSAML'
+            Condition:
+              StringEquals:
+                'SAML:aud': !Sub 'https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/quicksight-saml'
+
+Outputs:
+  QuickSightSamlApiEndpoint:
+    Description: API Gateway HTTP API endpoint URL for custom QuickSight SAML federation
+    Value: !Sub 'https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/quicksight-saml'
+
+  QuickSightSamlFederationRoleArn:
+    Description: IAM role for custom QuickSight SAML federation
+    Value: !GetAtt QuickSightSamlFederationRole.Arn
