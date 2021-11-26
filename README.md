@@ -9,7 +9,7 @@ This project implements a Lambda integration for custom SAML 2.0-based federatio
 
 ## Installation
 
-1. Create a new directory called **quicksight-saml** and change to it:
+1. Create a new directory called **quicksight-saml-project** and change to it:
 ```bash
 mkdir quicksight-saml-project && cd quicksight-saml-project
 ```
