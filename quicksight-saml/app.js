@@ -54,7 +54,7 @@ exports.lambdaHandler = async (event, context) => {
             quicksightUserRole = filteredResult.shift()['saml2:AttributeValue']['#text'].trim();
         }
     } catch (e) {
-        console.error('SAML response malformed.', e);
+        console.error('SAML response malformed.');
         return { statusCode: 500 };
     }
 
@@ -64,7 +64,7 @@ exports.lambdaHandler = async (event, context) => {
     try {
         callerIdentity = await sts.getCallerIdentity().promise();
     } catch (e) {
-        console.error('Caller identity could not be obtained.', e);
+        console.error('Caller identity could not be obtained.');
         return { statusCode: 500 };
     }
 
@@ -80,7 +80,7 @@ exports.lambdaHandler = async (event, context) => {
             SAMLAssertion: body.SAMLResponse
         }).promise();
     } catch (e) {
-        console.error('Role could not be assumed with SAML response.', e);
+        console.error('Role could not be assumed with SAML response.');
         return { statusCode: 500 };
     }
 
@@ -98,10 +98,10 @@ exports.lambdaHandler = async (event, context) => {
         }).promise();
     } catch (e) {
         if (e.code === 'ResourceNotFoundException') {
-            console.info(`QuickSight user "${federatedUserName}" not found. Registering new user.`);
+            console.info(`QuickSight user not found. Registering new user.`);
             userExists = false;
         } else {
-            console.error(`Describing QuickSight user "${federatedUserName}" failed.`, e);
+            console.error(`Describing QuickSight user failed.`);
         }
     }
 
@@ -119,7 +119,7 @@ exports.lambdaHandler = async (event, context) => {
                 SessionName: assumedRole.Subject
             }).promise();
         } catch (e) {
-            console.error('QuickSight user registration failed.', e);
+            console.error('QuickSight user registration failed.');
             return { statusCode: 500 };
         }
 
