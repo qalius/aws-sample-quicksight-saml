@@ -22,7 +22,10 @@ exports.lambdaHandler = async (event, context) => {
     // Check if request contains a SAML response
     if (!body.SAMLResponse) {
         console.error('SAML response was not provided.');
-        return { statusCode: 500 };
+        return {
+            statusCode: 500,
+            body: 'SAML response missing.'
+        };
     }
 
     // SAML response is Base64-encoded and needs to be decoded first
@@ -31,7 +34,10 @@ exports.lambdaHandler = async (event, context) => {
     // Validate the XML syntax of the SAML response
     if (parser.validate(saml) !== true) {
         console.error('SAML response is invalid XML.');
-        return { statusCode: 500 };
+        return {
+            statusCode: 500,
+            body: 'SAML response invalid.'
+        };
     }
 
     // Parse the XML structure of the SAML response and convert to an object
@@ -55,7 +61,10 @@ exports.lambdaHandler = async (event, context) => {
         }
     } catch (e) {
         console.error('SAML response malformed.');
-        return { statusCode: 500 };
+        return {
+            statusCode: 500,
+            body: 'SAML response malformed.'
+        };
     }
 
     let callerIdentity;
@@ -65,7 +74,10 @@ exports.lambdaHandler = async (event, context) => {
         callerIdentity = await sts.getCallerIdentity().promise();
     } catch (e) {
         console.error('Caller identity could not be obtained.');
-        return { statusCode: 500 };
+        return {
+            statusCode: 500,
+            body: 'Caller identity error.'
+        };
     }
 
     const awsAccountId = callerIdentity.Account;
@@ -81,7 +93,10 @@ exports.lambdaHandler = async (event, context) => {
         }).promise();
     } catch (e) {
         console.error('Role could not be assumed with SAML response.');
-        return { statusCode: 500 };
+        return {
+            statusCode: 500,
+            body: 'Role assumption error.'
+        };
     }
 
     // Build federated user name: IAMRoleName/email@example.org
@@ -120,7 +135,10 @@ exports.lambdaHandler = async (event, context) => {
             }).promise();
         } catch (e) {
             console.error('QuickSight user registration failed.');
-            return { statusCode: 500 };
+            return {
+                statusCode: 500,
+                body: 'User registration failed.'
+            };
         }
 
     }
@@ -170,7 +188,10 @@ exports.lambdaHandler = async (event, context) => {
         };
     } else {
         console.error('Sign-in URL could not be generated.');
-        return { statusCode: 500 };
+        return {
+            statusCode: 500,
+            body: 'Sign-in URL error.'
+        };
     }
 
 };
